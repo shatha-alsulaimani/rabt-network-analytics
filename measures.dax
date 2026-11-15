@@ -1,0 +1,63 @@
+// =============== Rabt Network Analytics — DAX Measures ===============
+// Create a blank table named _Measures and add these measures to it.
+
+// ---------- Content & engagement
+Total Posts = COUNTROWS ( FactPosts )
+Total Impressions = SUM ( FactPosts[Impressions] )
+Total Engagements = SUM ( FactPosts[Reactions] ) + SUM ( FactPosts[Comments] ) + SUM ( FactPosts[Reposts] )
+Engagement Rate % = DIVIDE ( [Total Engagements], [Total Impressions] )
+Avg Impressions per Post = DIVIDE ( [Total Impressions], [Total Posts] )
+CTR % = DIVIDE ( SUM ( FactPosts[Clicks] ), [Total Impressions] )
+
+Impressions PM =
+CALCULATE ( [Total Impressions], DATEADD ( DimDate[Date], -1, MONTH ) )
+
+Impressions MoM % =
+DIVIDE ( [Total Impressions] - [Impressions PM], [Impressions PM] )
+
+Impressions YTD = TOTALYTD ( [Total Impressions], DimDate[Date] )
+
+Impressions 3M Rolling Avg =
+AVERAGEX (
+    DATESINPERIOD ( DimDate[Date], MAX ( DimDate[Date] ), -3, MONTH ),
+    [Total Impressions]
+) // use on a monthly axis
+
+// ---------- Members
+New Members = COUNTROWS ( DimMember )   // relate DimDate[Date] -> DimMember[JoinDate] (inactive) if needed
+Cumulative Members =
+CALCULATE (
+    COUNTROWS ( DimMember ),
+    FILTER ( ALL ( DimMember[JoinDate] ), DimMember[JoinDate] <= MAX ( DimDate[Date] ) )
+)
+
+// ---------- Job market
+Total Jobs = COUNTROWS ( FactJobPostings )
+Median Salary (SAR) = MEDIAN ( FactJobPostings[MonthlySalarySAR] )
+Remote/Hybrid Share % =
+DIVIDE (
+    CALCULATE ( [Total Jobs], FactJobPostings[WorkType] IN { "Remote", "Hybrid" } ),
+    [Total Jobs]
+)
+Jobs Requiring Skill = DISTINCTCOUNT ( BridgeJobSkill[JobID] )
+
+// ---------- Hiring funnel
+Total Applications = COUNTROWS ( FactApplications )
+Applications per Job = DIVIDE ( [Total Applications], [Total Jobs] )
+
+Reached Viewed =
+CALCULATE ( [Total Applications], FactApplications[FurthestStage] IN { "Viewed", "Interview", "Offer", "Hired" } )
+Reached Interview =
+CALCULATE ( [Total Applications], FactApplications[FurthestStage] IN { "Interview", "Offer", "Hired" } )
+Reached Offer =
+CALCULATE ( [Total Applications], FactApplications[FurthestStage] IN { "Offer", "Hired" } )
+Hired = CALCULATE ( [Total Applications], FactApplications[FurthestStage] = "Hired" )
+
+Interview Rate % = DIVIDE ( [Reached Interview], [Total Applications] )
+Offer Acceptance % = DIVIDE ( [Hired], [Reached Offer] )
+Hire Rate % = DIVIDE ( [Hired], [Total Applications] )
+Avg Days to First Response = AVERAGE ( FactApplications[DaysToFirstResponse] )
+
+// ---------- Dynamic title
+Selected Period Title =
+"Performance · " & FORMAT ( MIN ( DimDate[Date] ), "MMM yyyy" ) & " – " & FORMAT ( MAX ( DimDate[Date] ), "MMM yyyy" )
