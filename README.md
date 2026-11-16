@@ -42,6 +42,7 @@
 | `generate_dataset.py` | Python (NumPy + pandas) script that builds the dataset with realistic patterns: weekday and Ramadan effects, format-based reach, a hiring funnel |
 | `measures.dax` | All DAX measures used in the report |
 | `Rabt_Professional_Network_Dataset.xlsx` | The generated dataset, one sheet per table |
+| `Rabt_Network_Analytics.pbix` | The Power BI report (4 pages). Open it in Power BI Desktop; if the data path differs on your machine, point the `DataFile` parameter to the xlsx and refresh |
 
 Rebuild the data: `pip install numpy pandas openpyxl` then `python generate_dataset.py data`.
 
