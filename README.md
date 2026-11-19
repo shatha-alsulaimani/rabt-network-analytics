@@ -36,6 +36,9 @@
 3. **Job Market** — Top skills, postings by city, work type, salary by level
 4. **Hiring Funnel** — Applied → Viewed → Interview → Offer → Hired, response time, source
 
+## Preview
+![Hiring Funnel page](images/hiring_funnel.png)
+
 ## Files
 | File | What it is |
 |---|---|
